@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { Car } from './entities/car.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class CarService {
+  constructor(
+    @InjectModel(Car.name) private model: Model<Car>
+  ){}
+
   create(createCarDto: CreateCarDto) {
-    return 'This action adds a new car';
+    const created = new this.model(createCarDto);
+    return created.save();
   }
 
   findAll() {
-    return `This action returns all car`;
+    return this.model.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} car`;
+  findOne(id: string) {
+    return this.model.findById(id).exec();
   }
 
-  update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
+  update(id: string, updateCarDto: UpdateCarDto) {
+    return this.model.findByIdAndUpdate(id, updateCarDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} car`;
+  remove(id: string) {
+    return this.model.findByIdAndDelete(id);
   }
 }
